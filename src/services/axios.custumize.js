@@ -4,11 +4,8 @@ import axios from "axios";
 const instance = axios.create({
     baseURL: import.meta.env.VITE_BACKEND_URL
   });
-  
   // Alter defaults after instance has been created
 //   instance.defaults.headers.common['Authorization'] = AUTH_TOKEN;
-
-
 
 // Add a request interceptor
 instance.interceptors.request.use(function (config) {
