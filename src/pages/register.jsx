@@ -1,7 +1,7 @@
 import React from "react";
-import { Input, Button, Form, notification, Row, Col } from "antd";
+import { Input, Button, Form, notification, Row, Col, Divider } from "antd";
 import { registerUserApi } from "../services/api.services";
-import { useNavigate } from "react-router";
+import { Link,useNavigate } from "react-router";
 const RegisterPage = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -34,8 +34,10 @@ const RegisterPage = () => {
       form={form}
       layout="vertical"
       onFinish={onFinish}
+      style={{margin: "30px"}}
       // onFinishFailed={onFinishFailed}
     >
+    <h3 style={{textAlign:"center"}}>Đăng ký tài khoản</h3>
       <Row>
         <Col xs={24} md={6}>
           <Form.Item
@@ -91,8 +93,9 @@ const RegisterPage = () => {
           <Button onClick={() => form.submit()} type="primary">
             Register
           </Button>
-
-          <Button
+          <Divider/>
+          <div>Đã có tài khoản? <Link to={"/login"}>Đăng nhập tại đây</Link></div>
+          {/* <Button
             onClick={() => {
               form.setFieldsValue({
                 email: "khac1@gmail.com",
@@ -102,7 +105,7 @@ const RegisterPage = () => {
             }}
           >
             Test
-          </Button>
+          </Button> */}
         </div>
       </Row>
     </Form>

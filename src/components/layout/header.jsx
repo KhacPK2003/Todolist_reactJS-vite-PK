@@ -25,6 +25,21 @@ const Header = () => {
           key: 'products',
           icon: <ProductOutlined />,
         },
+        {
+          label: <Link to={"/"}>Cài đặt</Link>,
+          key: 'setting',
+          icon: <SettingOutlined />,
+          children: [
+            {
+              label: <Link to={"/login"}>Đăng nhập</Link>,
+              key: 'login',
+            },
+            {
+              label: 'Đăng xuất',
+              key: 'logout',
+            }
+          ],
+        },
       ];
     return (
       <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items}/>  
