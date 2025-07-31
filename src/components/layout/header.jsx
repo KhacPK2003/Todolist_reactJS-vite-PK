@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 // import './header.css'
 import {Menu} from 'antd';
 import { Link, NavLink } from 'react-router-dom';
 import { AppstoreOutlined, HomeOutlined, MailOutlined, ProductOutlined, SettingOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import { AuthContext } from '../context/auth.context';
 const Header = () => {
     const [current, setCurrent] = useState('mail');
+
+    const user = useContext(AuthContext);
+
+    console.log("Check data: ", user)
+    
   const onClick = e => {
     console.log('click ', e);
     setCurrent(e.key);
