@@ -2,12 +2,15 @@ import React, { useContext, useState } from 'react';
 // import './header.css'
 import {Menu} from 'antd';
 import { Link, NavLink } from 'react-router-dom';
-import { AppstoreOutlined, HomeOutlined, MailOutlined, ProductOutlined, SettingOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, HomeOutlined, MailOutlined, 
+  ProductOutlined, SettingOutlined, UsergroupAddOutlined,
+  LoginOutlined, AliwangwangOutlined
+} from '@ant-design/icons';
 import { AuthContext } from '../context/auth.context';
 const Header = () => {
     const [current, setCurrent] = useState('mail');
 
-    const user = useContext(AuthContext);
+    const {user} = useContext(AuthContext);
 
     console.log("Check data: ", user)
     
@@ -31,21 +34,26 @@ const Header = () => {
           key: 'products',
           icon: <ProductOutlined />,
         },
-        {
-          label: <Link to={"/"}>Cài đặt</Link>,
-          key: 'setting',
-          icon: <SettingOutlined />,
+
+        ...(!user.id  ? [{
+          label: <Link to={"/login"}>Đăng nhập</Link>,
+          key: 'login',
+          icon: <LoginOutlined />,
+        }] : []),
+        
+
+        ...(user.id ? [{
+          label: `Welcome ${user.fullName}`,
+          key: 'settings',
+          icon: <AliwangwangOutlined />,
           children: [
-            {
-              label: <Link to={"/login"}>Đăng nhập</Link>,
-              key: 'login',
-            },
             {
               label: 'Đăng xuất',
               key: 'logout',
             }
-          ],
-        },
+          ]
+        },] : []),
+        
       ];
     return (
       <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items}/>  
