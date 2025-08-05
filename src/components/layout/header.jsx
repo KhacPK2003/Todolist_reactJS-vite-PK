@@ -12,10 +12,8 @@ const Header = () => {
 
     const {user} = useContext(AuthContext);
 
-    console.log("Check data: ", user)
     
   const onClick = e => {
-    console.log('click ', e);
     setCurrent(e.key);
   };
     const items = [

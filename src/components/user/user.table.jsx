@@ -98,7 +98,7 @@ const UserTable = (props) => {
         setPageSize(+pagination.pageSize)  // thêm dấu + trc 1 tên biến để nó sẽ tự động convert từ chuỗi string sang số nguyên
       }
     }
-    console.log("<<< check ", {pagination, filters, sorter, extra})
+  
   };
 
     return (
