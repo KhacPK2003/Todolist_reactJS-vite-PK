@@ -80,7 +80,6 @@ const ViewUserDetail = (props) => {
             width: "100%",
             objectFit:"contain"
           }}
-          src={`${import.meta.env.VITE_BACKEND_URL}/images/avatar/${dataDetail.avatar}`}
           />
         </div>
         <div>
