@@ -5,6 +5,7 @@ import ViewBookDetail from "./view.book.detail";
 import CreateBookControl from "./create.book.control";
 import { fetchAllBookAPI } from "../../services/api.services";
 import CreateBookUncontrol from "./create.book.uncontrol";
+import UpdateBookControl from "./update.book.control";
 const BookTable = (props) => {
   const[current, setCurrent] = useState(1);
   const[pageSize, setPageSize] = useState(5);
@@ -14,6 +15,8 @@ const BookTable = (props) => {
   const [dataDetail, setDataDetail] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
+  const [dataUpdate, setDataUpdate] = useState(null);
 
   useEffect(() =>{
     loadBook();
@@ -75,7 +78,12 @@ const BookTable = (props) => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <EditOutlined style={{ cursor: "pointer", color: "orange" }} />
+          <EditOutlined style={{ cursor: "pointer", color: "orange" }} 
+            onClick={() => {
+              setDataUpdate(record)
+              setIsModalUpdateOpen(true);
+            }}
+          />
           <DeleteOutlined style={{ cursor: "pointer", color: "red" }} />
         </Space>
       ),
@@ -132,6 +140,13 @@ const BookTable = (props) => {
         setDataDetail={setDataDetail}
         isDetailOpen={isDetailOpen}
         setIsDetailOpen={setIsDetailOpen}
+      />
+      <UpdateBookControl
+        dataUpdate={dataUpdate}
+        setDataUpdate={setDataUpdate}
+        isModalUpdateOpen={isModalUpdateOpen}
+        setIsModalUpdateOpen={setIsModalUpdateOpen}
+        loadBook={loadBook}
       />
     </>
   );

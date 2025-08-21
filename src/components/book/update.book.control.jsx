@@ -1,14 +1,19 @@
-import { Button, Modal, notification } from "antd";
-import { InputNumber } from "antd";
-import { Select, Space } from "antd";
-import { Input } from "antd";
-import React, { useState } from "react";
-import { createBookApi, handleUploadFile } from "../../services/api.services";
-const CreateBookControl = (props) => {
-  const { isCreateOpen, setIsCreateOpen, loadBook } = props;
+import React, { useEffect, useState } from "react";
+import {
+  Button,
+  Descriptions,
+  Input,
+  InputNumber,
+  Modal,
+  Select,
+  notification,
+} from "antd";
+import { handleUploadFile, updateBookApi } from "../../services/api.services";
 
+const UpdateBookControl = (props) => {
+  const [id, setId] = useState("");
   const [mainText, setMainText] = useState("");
-  const [author, setAuThor] = useState("");
+  const [author, setAuthor] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
   const [category, setCategory] = useState("");
@@ -16,59 +21,98 @@ const CreateBookControl = (props) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  const handleSubmitBtn = async () => {
-    if (!selectedFile) {
-      notification.error({
-        message: "Error create book",
-        description: "Vui lòng upload ảnh thumbnail",
+  const {
+    loadBook,
+    dataUpdate,
+    setDataUpdate,
+    isModalUpdateOpen,
+    setIsModalUpdateOpen,
+  } = props;
+
+  const updateBook = async (newThumbnail) => {
+    const resBook = await updateBookApi(
+      id,
+      newThumbnail,
+      mainText,
+      author,
+      price,
+      quantity,
+      category
+    );
+    if (resBook.data) {
+      ResetAndCloseModal();
+      await loadBook();
+      notification.success({
+        message: "Update book",
+        description: "Cập nhật  book thành công",
       });
-      return;
-    }
-    //step 1: upload
-    const resUpload = await handleUploadFile(selectedFile, "book");
-    if (resUpload.data) {
-      //success
-      const newThumbnail = resUpload.data.fileUploaded;
-      // step 2: create book
-      const resBook = await createBookApi(
-        newThumbnail,
-        mainText,
-        author,
-        price,
-        quantity,
-        category
-      );
-      if (resBook.data) {
-        resetAndCloseModal();
-        await loadBook();
-        notification.success({
-          message: "Create book",
-          description: "Tạo mới book thành công",
-        });
-      } else {
-        notification.error({
-          message: "Error create book",
-          description: JSON.stringify(resBook.message),
-        });
-      }
     } else {
       notification.error({
-        message: "Error upload file",
-        description: JSON.stringify(resUpload.message),
+        message: "Error update book",
+        description: JSON.stringify(resBook.message),
       });
     }
   };
 
-  const resetAndCloseModal = () => {
-    setMainText("");
-    setAuThor("");
-    setCategory("");
-    setQuantity("");
-    setPrice("");
-    setSelectedFile(null);
-    setPreview(null);
-    setIsCreateOpen(false);
+  const handleSubmitBtn = async () => {
+    if (!selectedFile && !preview) {
+      notification.error({
+        message: "Error update book",
+        Descriptions: "Vui lòng upload ảnh thumbnail",
+      });
+      return;
+    }
+    let newThumbnail = "";
+    // có ảnh preview và không có file => ko upload file
+    if (!selectedFile && preview) {
+      // do nothing
+      newThumbnail = dataUpdate.newThumbnail;
+    } else {
+      // có ảnh preview và có file => upload file
+      const resUpload = await handleUploadFile(selectedFile, "book");
+      if (resUpload.data) {
+        //success
+        newThumbnail = resUpload.data.fileUploaded;
+      } else {
+        //failed
+        notification.error({
+          message: "Error upload file",
+          description: JSON.stringify(resUpload.message),
+        });
+        return;
+      }
+    }
+    //step 2: update book
+    await updateBook(newThumbnail);
   };
+
+  const ResetAndCloseModal = () => {
+    setMainText("");
+    setId("");
+    setAuthor("");
+    setPrice("");
+    setQuantity("");
+    setCategory("");
+    setPreview(null);
+    setDataUpdate(null);
+    setSelectedFile(null);
+    setIsModalUpdateOpen(false);
+  };
+  useEffect(() => {
+    if (dataUpdate && dataUpdate._id) {
+      setId(dataUpdate._id);
+      setMainText(dataUpdate.mainText);
+      setAuthor(dataUpdate.author);
+      setPrice(dataUpdate.price);
+      setQuantity(dataUpdate.quantity);
+      setCategory(dataUpdate.category);
+      setPreview(
+        `${import.meta.env.VITE_BACKEND_URL}/images/book/${
+          dataUpdate.thumbnail
+        }`
+      );
+    }
+  }, [dataUpdate]);
 
   const handleOnchangeFile = (event) => {
     if (!event.target.files || event.target.files.length === 0) {
@@ -83,24 +127,21 @@ const CreateBookControl = (props) => {
       setPreview(URL.createObjectURL(file));
     }
   };
-
   return (
-    <div className="user-form" style={{ margin: "20px 0" }}>
-      <div style={{ display: "flex", gap: "15px", flexDirection: "column" }}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <h3>Table Book</h3>
-          <Button type="primary" onClick={() => setIsCreateOpen(true)}>
-            Create Book
-          </Button>
-        </div>
-        <Modal
-          title="Create Book"
-          open={isCreateOpen}
-          onOk={() => handleSubmitBtn()}
-          onCancel={() => resetAndCloseModal()}
-          maskClosable={false}
-          okText={"CREATE"}
-        >
+    <>
+      <Modal
+        title="Update Book"
+        open={isModalUpdateOpen}
+        onOk={() => handleSubmitBtn()}
+        maskClosable={false}
+        onCancel={ResetAndCloseModal}
+        okText={"Update"}
+      >
+        <div style={{ display: "flex", gap: "15px", flexDirection: "column" }}>
+          <div>
+            <span>Id</span>
+            <Input value={id} disabled />
+          </div>
           <div>
             <span>Tiêu đề</span>
             <Input
@@ -115,7 +156,7 @@ const CreateBookControl = (props) => {
             <Input
               value={author}
               onChange={(event) => {
-                setAuThor(event.target.value);
+                setAuthor(event.target.value);
               }}
             />
           </div>
@@ -126,7 +167,7 @@ const CreateBookControl = (props) => {
               addonAfter={" đ"}
               value={price}
               onChange={(event) => {
-                setPrice(event);
+                setPrice(event)
               }}
             />
           </div>
@@ -136,7 +177,7 @@ const CreateBookControl = (props) => {
               style={{ width: "100%" }}
               value={quantity}
               onChange={(event) => {
-                setQuantity(event);
+                setQuantity(event)
               }}
             />
           </div>
@@ -145,8 +186,8 @@ const CreateBookControl = (props) => {
             <Select
               style={{ width: "100%" }}
               value={category}
-              onChange={(event) => {
-                setCategory(event);
+              onChange={(value) => {
+                setCategory(value);
               }}
               options={[
                 { value: "Arts", label: "Arts" },
@@ -163,7 +204,8 @@ const CreateBookControl = (props) => {
                 { value: "Travel", label: "Travel" },
               ]}
             />
-            
+          </div>
+          <div>
             <div>
               <span>Thumnail</span>
               <label
@@ -213,10 +255,10 @@ const CreateBookControl = (props) => {
               </>
             )}
           </div>
-        </Modal>
-      </div>
-    </div>
+        </div>
+      </Modal>
+    </>
   );
 };
 
-export default CreateBookControl;
+export default UpdateBookControl;
