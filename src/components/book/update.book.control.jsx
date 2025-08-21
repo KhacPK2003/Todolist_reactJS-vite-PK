@@ -106,11 +106,7 @@ const UpdateBookControl = (props) => {
       setPrice(dataUpdate.price);
       setQuantity(dataUpdate.quantity);
       setCategory(dataUpdate.category);
-      setPreview(
-        `${import.meta.env.VITE_BACKEND_URL}/images/book/${
-          dataUpdate.thumbnail
-        }`
-      );
+      setPreview(`${import.meta.env.VITE_BACKEND_URL}/images/book/${dataUpdate.thumbnail}`);
     }
   }, [dataUpdate]);
 
