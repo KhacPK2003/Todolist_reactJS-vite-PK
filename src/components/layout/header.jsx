@@ -1,8 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 // import './header.css'
 import {Menu, message} from 'antd';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { AppstoreOutlined, HomeOutlined, MailOutlined, 
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { HomeOutlined, MailOutlined, 
   ProductOutlined, SettingOutlined, UsergroupAddOutlined,
   LoginOutlined, AliwangwangOutlined
 } from '@ant-design/icons';
@@ -12,12 +12,25 @@ import { logoutAPI } from '../../services/api.services';
 const Header = () => {
     const [current, setCurrent] = useState('mail');
     const navigate = useNavigate();
+    const location = useLocation();
     const {user, setUser} = useContext(AuthContext);
 
     
   const onClick = e => {
     setCurrent(e.key);
   };
+
+  useEffect(() =>{
+    if(location && location.pathname) {
+      const allRoutes = ["users", "books"];
+      const currentRoute = allRoutes.find(item => `/${item}` ===location.pathname);
+      if (currentRoute) {
+        setCurrent(currentRoute);
+      } else {
+        setCurrent("home");
+      }
+    }
+  }, [location])
 
   const handleLogout = async() => {
     const res = await logoutAPI();
