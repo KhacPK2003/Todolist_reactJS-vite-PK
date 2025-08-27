@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Space, Table, Tag } from "antd";
+import { Popconfirm, Space, Table, Tag, notification } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import ViewBookDetail from "./view.book.detail";
 import CreateBookControl from "./create.book.control";
-import { fetchAllBookAPI } from "../../services/api.services";
+import { deleteBookAPI, fetchAllBookAPI } from "../../services/api.services";
 import CreateBookUncontrol from "./create.book.uncontrol";
 import UpdateBookControl from "./update.book.control";
 import UpdateBookUnControl from "./update.book.uncontrol";
@@ -31,6 +31,22 @@ const BookTable = (props) => {
         setPageSize(res.data.meta.pageSize);
         setTotal(res.data.meta.total);
     }
+}
+
+const handleDeleteBook = async (id) => {
+  const res = await deleteBookAPI(id);
+  if(res.data){
+    notification.success({
+      message: "Delete book",
+      description: "Xóa book thành công"
+    })
+    await loadBook();
+  } else {
+    notification.error ({
+      message:"Error delete book",
+      description: JSON.stringify(res.message)
+    })
+  }
 }
 
   const columns = [
@@ -85,7 +101,16 @@ const BookTable = (props) => {
               setIsModalUpdateOpen(true);
             }}
           />
+          <Popconfirm
+            title="Xóa book"
+            description="Bạn chắc chắn xóa book này ?"
+            onConfirm={() => handleDeleteBook(record._id)}
+            okText="Yes"
+            cancelText="No"
+            placement="bottom"
+          >
           <DeleteOutlined style={{ cursor: "pointer", color: "red" }} />
+          </Popconfirm>
         </Space>
       ),
     },
